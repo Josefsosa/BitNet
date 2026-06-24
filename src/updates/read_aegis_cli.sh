@@ -1,0 +1,10 @@
+#!/bin/bash
+FILE="/home/jsosa/workspace/BitNet/src/aegis-cli.py"
+echo "=== DEFAULT_SYSTEM constant ==="
+grep -n "DEFAULT_SYSTEM" "$FILE"
+echo ""
+echo "=== formatted_prompt lines ==="
+grep -n "formatted_prompt" "$FILE"
+echo ""
+echo "=== Full file (so we see everything) ==="
+cat -n "$FILE"

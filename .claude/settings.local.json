@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(lsof:*)",
+      "Bash(kill:*)",
+      "Bash(echo:*)",
+      "Bash(export GEMINI_API_KEY=\"$GEMINI_API_KEY\")",
+      "Bash(bash:*)",
+      "Bash(find:*)",
+      "Bash(export GEMINI_API_KEY:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(wc -l:*)",
+      "Bash(npx tsc:*)",
+      "Bash(./node_modules/.bin/tsc:*)",
+      "Bash(/home/jsosa/workspace/aegis-ternary/src/longbow-canvas/graph_engine_v2/longbow-ui/node_modules/.bin/tsc:*)",
+      "Bash(/home/jsosa/workspace/aegis-ternary/src/longbow-canvas/graph_engine_v2/longbow-ui/node_modules/.bin/vite build:*)",
+      "Bash(chmod:*)",
+      "Bash(npx vite:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npx firebase:*)",
+      "Bash(pip install:*)",
+      "Bash(cat:*)",
+      "Bash(npm install:*)",
+      "Bash(npx vitest run:*)"
+    ]
+  }
+}

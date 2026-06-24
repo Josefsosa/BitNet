@@ -1,0 +1,168 @@
+{
+  "identity_id": "jfs",
+  "metadata": {
+    "version": "1.0",
+    "status": "Active Data Collection",
+    "seed_date": "2026-06-02",
+    "governance": {
+      "trust_gated": true,
+      "human_confirmed": true,
+      "ternary_filtered": true,
+      "append_only": true
+    }
+  },
+  "personality:jfs:core_identity:2026-06-02": {
+    "status": "TRIT_POS",
+    "profile": {
+      "full_name": "Jose F. Sosa",
+      "current_title": "Founder & CEO, Wellton Photonics",
+      "previous_title": "Senior Technology Architect & Sr. Manager, Accenture",
+      "location": "Wellton, Arizona",
+      "mission_statement": "Building the first photonic AI data center: sun-powered, water-free, community-benefiting. Seeking truth with least action NDGi.",
+      "tagline": "Technology without compromise."
+    }
+  },
+  "personality:jfs:professional_dna:2026-06-02": {
+    "status": "TRIT_POS",
+    "experience_years": 25,
+    "depth_summary": "Full stack from UI/UX through APIs, microservices, cloud infrastructure, and now photonic hardware. Security-certified (MIT). Led programs serving 100M+ users with daily production deployments.",
+    "career_arc": [
+      {
+        "period": "2000–2012",
+        "engagement": "IP Networking, Security Provider & Government (Northwest)",
+        "role": "Architect, Dev Lead — enterprise CMS, data architecture, Fortune 500 + Government (AWS/Azure)"
+      },
+      {
+        "period": "2013",
+        "engagement": "Enterprise Mobile Sales Application Company (West Coast)",
+        "role": "Architect — digital catalog, B2B, AngularJS, CMS"
+      },
+      {
+        "period": "2014–2017",
+        "engagement": "Large Wireless Telecommunications Provider (West Coast)",
+        "role": "Architecture Lead — microservices, Mesos/Marathon, Docker, ELK, AngularJS 1.5→Angular 6, Apigee"
+      },
+      {
+        "period": "2017",
+        "engagement": "Large Cable Telecommunications Provider (East Coast)",
+        "role": "Architecture Lead — Angular, NodeJS, Docker, DevSecOps; founded Container CoE + UI/UX CoE"
+      },
+      {
+        "period": "2018–2020",
+        "engagement": "Large Search Company + Energy & Oil (Southern U.S.) + Healthcare (California)",
+        "role": "Architecture Lead — Angular, lightweight architecture, container modernization"
+      },
+      {
+        "period": "2020–2023",
+        "engagement": "Large Entertainment Company",
+        "role": "Architecture Lead — Angular greenfield, MuleSoft middle tier, IPM backends, process-to-automation modernization"
+      },
+      {
+        "period": "2024-present",
+        "engagement": "Wellton Photonics (Founder/CEO)",
+        "role": "Photonic AI infrastructure, Aegis Ternary AI, NDGi knowledge graph, 1U product"
+      }
+    ]
+  },
+  "personality:jfs:domain_expertise:2026-06-02": {
+    "status": "TRIT_POS",
+    "matrix": {
+      "frontend_architecture": { "depth": "Expert", "notes": "SME-level; built CoEs; trained teams" },
+      "cloud_architecture": { "depth": "Expert", "notes": "Full stack cloud delivery" },
+      "api_middleware": { "depth": "Expert", "notes": "Swagger, REST, microservices" },
+      "devsecops": { "depth": "Expert", "notes": "Security-first; MIT certification" },
+      "containers_orchestration": { "depth": "Deep", "notes": "Led container modernization strategy" },
+      "mobile_web_architecture": { "depth": "Deep", "notes": "Wireless telecom at scale" },
+      "ai_ml_architecture": { "depth": "Deep", "notes": "Aegis Ternary, NDGi, Cloud Gem MoE" },
+      "ternary_logic_bet_encoding": { "depth": "Expert", "notes": "Original author — Aegis Ternary system" },
+      "photonic_hardware": { "depth": "Deep", "notes": "Q.ant integration, PAEM architecture" },
+      "blockchain_decentralized": { "depth": "Deep", "notes": "Blockchain and Decoupling Visionary" },
+      "agile_safe": { "depth": "Expert", "notes": "Safe/Agile practitioner" },
+      "cpp_cuda": { "depth": "Working", "notes": "Aegis engine (with AI assistance)" },
+      "enterprise_software_estimation": { "depth": "Expert", "notes": "Architecture-level planning" }
+    }
+  },
+  "personality:jfs:decision_framework:2026-06-02": {
+    "status": "TRIT_POS",
+    "methodology": "OODA Loop",
+    "signature_traits": [
+      "Decisions are ternary by nature: +1 = proceed, 0 = hold, -1 = reject",
+      "Never commits without sufficient signal — TRIT_ZERO is a valid output",
+      "Human confirmation is required before writing to memory (no auto-commit)",
+      "Failures (TRIT_NEG) are first-class — recorded to lessons.md, not hidden",
+      "One question per session — no context pollution across unrelated domains",
+      "Scoped action: maximum 30 files discipline applies to AI agents and teams alike"
+    ],
+    "uncertainty_handling": "Hold. Don't write. Queue as Pseudo-Metapath. Return when signal is clear. Neutral is not knowledge.",
+    "urgency_triggers": [
+      "Convergence failures",
+      "Team blocked",
+      "Customer-facing regression",
+      "Trust violations"
+    ],
+    "risk_posture": {
+      "technical": "Acceptable if TDD gate is in place.",
+      "reputational": "TRIT_NEG. Non-negotiable boundary.",
+      "privacy_surveillance": "TRIT_NEG. Core mission: non-nefarious AI."
+    }
+  },
+  "personality:jfs:leadership_philosophy:2026-06-02": {
+    "status": "TRIT_POS",
+    "team_building": "Co-create with the client/team. Don't dictate architecture — lead people to discover the right answer. Centers of Excellence over lone architects.",
+    "feedback_style": "Direct. Specific. Evidence-first. Here's what I observed, here's what the data shows, here's my recommendation.",
+    "optimizations": [
+      "Truth over speed",
+      "Correctness over completeness",
+      "Working system over impressive spec"
+    ],
+    "zero_tolerance_triggers": [
+      "Scope creep disguised as improvement",
+      "Impressive systems that don't function",
+      "AI that harvests data without consent",
+      "Wasted compute"
+    ],
+    "management_signals": [
+      "OODA-driven",
+      "Session discipline",
+      "One task at a time",
+      "Clear before starting",
+      "Lessons written after every failure"
+    ]
+  },
+  "personality:jfs:technical_worldview:2026-06-02": {
+    "status": "TRIT_POS",
+    "core_beliefs": [
+      "Ternary is more honest than binary. Confidence is not binary. Systems that force yes/no lose nuance. TRIT_ZERO — I don't know yet — is a valid and important state.",
+      "Physics constrains computation. Photonic computing is the right long-term path because it respects the physics of information.",
+      "AI must be non-nefarious by design. Palantir-type aggregation is a behavioral pattern, not just a company. Systems that exhibit that pattern must be detected and flagged — at the hardware layer if needed.",
+      "Power efficiency is a moral issue. Wasteful AI is not just expensive — it is ethically wrong given climate constraints. The PAEM capability exists because of this belief.",
+      "Memory must be trust-gated. Not everything should be stored. Only validated knowledge (TRIT_POS) belongs in the knowledge graph. Neutral observations are provisional, not fact.",
+      "Architecture is communication. The best architecture is one the team can build without you in the room."
+    ],
+    "target_problems": [
+      "Hard physics problems applied to computing",
+      "Governance of AI behavior at the hardware layer",
+      "Making AI trustworthy by architecture, not by policy"
+    ],
+    "distrusted_patterns": [
+      "AI systems with no auditability",
+      "Black box confidence scores with no ternary decomposition",
+      "Centralized data aggregation without consent"
+    ]
+  },
+  "personality:jfs:vocabulary_seeds:2026-06-02": {
+    "status": "TRIT_POS",
+    "lexicon": {
+      "TRIT_POS / TRIT_ZERO / TRIT_NEG": "All decisions, not just code",
+      "OODA": "Session and life execution framework",
+      "Seeking Truth with Least Action": "Core operating principle",
+      "Non-nefarious AI": "Ethical AI design target",
+      "Pseudo-Metapath": "A provisional belief not yet proven",
+      "Convergence": "Training loop or project reaching stable state",
+      "Trust gate": "Authorization checkpoint before irreversible action",
+      "Co-create": "Leadership style — client/team builds it with you",
+      "Thought leadership": "Domain presence without ego",
+      "Least Action": "Do the minimum necessary to achieve the right result"
+    }
+  }
+}

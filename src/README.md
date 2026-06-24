@@ -203,3 +203,328 @@ Comparison of optimized parallel kernels vs. original implementation:
 - ✅ x86-64 with AVX2
 - ✅ ARM with NEON
 - ✅ ARM with DOTPROD extension
+
+## Aegis Local Inference Runbook
+
+Use `src/aegis_local_inference_server.py` as the canonical local LLM entrypoint.
+This file is local-only by default: it starts a local `llama-server` backend and
+exposes an OpenAI-compatible API at `/v1/chat/completions`.
+
+Do not use `aegis_server.py` when the goal is local model evaluation. That file
+is the older Headroom/Gemini router and can redirect traffic to port `8787`.
+
+### OODA Startup Steps
+
+1. **Observe**: list what models are available and whether each is ready.
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py list
+```
+
+2. **Orient**: check a model before serving it.
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py check-model bitnet-2b
+```
+
+3. **Decide**: choose the alias and ports for the test run.
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model bitnet-2b --port 5510
+```
+
+4. **Act**: test the OpenAI-compatible endpoint.
+
+```bash
+curl -s -X POST http://127.0.0.1:5510/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"local","messages":[{"role":"user","content":"Reply with exactly: local-ok"}],"temperature":0,"max_tokens":16}'
+```
+
+### Shorthand Model Switching
+
+Start one model per server process. To switch models, stop the running server
+with `Ctrl+C`, then start the next alias.
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model bitnet-2b --port 5510
+```
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model bitnet-3b --port 5510
+```
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model qwen-coder-7b --port 5510
+```
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model gemma-12b --port 5510
+```
+
+Use a different internal backend port when running two local servers at once:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model bitnet-2b --port 5510 --backend-port 5511
+```
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model qwen-coder-7b --port 5520 --backend-port 5521
+```
+
+### Current Model Aliases
+
+| Alias | Backend | Description | Path |
+| --- | --- | --- | --- |
+| `bitnet-2b` | `llama.cpp` | BitNet b1.58 2B-4T I2_S GGUF | `/home/jsosa/workspace/BitNet/models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf` |
+| `bitnet-3b` | `llama.cpp` | BitNet b1.58 3B I2_S GGUF | `/home/jsosa/workspace/BitNet/models/bitnet_b1_58-3B/ggml-model-i2_s.gguf` |
+| `qwen-coder-7b` | `llama.cpp` | Qwen 2.5 Coder 7B Instruct Q4_K_M GGUF | `/home/jsosa/workspace/BitNet/models/qwen2.5-coder-7b-instruct-q4_k_m.gguf` |
+| `gemma-12b` | `llama.cpp` | Gemma 12B Queen IQ2_XXS GGUF | `/home/jsosa/workspace/BitNet/models/gemma-4-12B-Queen-it-qat-q4_0-unquantized.i1-IQ2_XXS.gguf` |
+| `llama-3-8b` | `llama.cpp` | Llama 3 8B Instruct Q4_K_M GGUF | `/home/jsosa/workspace/BitNet/models/llama-3-8b-Instruct-Q4_K_M.gguf` |
+| `gsl` | `transformers` | GSL Safetensors checkpoint placeholder | `/home/jsosa/workspace/BitNet/models/model-00001-of-00282.safetensors` |
+
+### Adding Downloaded Models
+
+For a new GGUF model:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py add-model /home/jsosa/workspace/BitNet/models/new-model.gguf --alias new-model
+python3 aegis_local_inference_server.py check-model new-model
+python3 aegis_local_inference_server.py serve --model new-model --port 5510
+```
+
+For a Transformers/Safetensors model directory:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py add-model /home/jsosa/workspace/BitNet/models/new-transformers-model --alias new-transformers --backend transformers
+python3 aegis_local_inference_server.py check-model new-transformers
+```
+
+Transformers/Safetensors models require a complete checkpoint directory,
+including `config.json`, tokenizer files, all shard files or
+`model.safetensors.index.json`, and Python packages `torch`, `transformers`,
+`safetensors`, and `accelerate`.
+
+### GSL Status
+
+`gsl` is registered, but it is not serve-ready yet. The current file is only:
+
+```text
+/home/jsosa/workspace/BitNet/models/model-00001-of-00282.safetensors
+```
+
+That filename indicates shard `1` of `282`. Before serving `gsl`, complete the
+download and make sure the model directory contains the full shard set,
+`model.safetensors.index.json`, `config.json`, and tokenizer files. Verify with:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py check-model gsl
+```
+
+### tmux Remote Access Wrapper
+
+Use `--tmux` when you want the local server to keep running after your SSH or
+remote shell disconnects. The wrapper starts a detached tmux session from
+`/home/jsosa/workspace/BitNet/src` and prints the attach/stop commands.
+
+Start a model in tmux:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model bitnet-2b --port 5510 --tmux --session aegis-local
+```
+
+Attach while traveling or after reconnecting:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py tmux-attach --session aegis-local
+```
+
+Detach without stopping the server:
+
+```text
+Ctrl+B, then D
+```
+
+List running tmux sessions:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py tmux-list
+```
+
+Stop the tmux-hosted server:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py tmux-stop --session aegis-local
+```
+
+You can keep separate sessions for different tests by changing both the public
+port and tmux session name:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model qwen-coder-7b --port 5520 --backend-port 5521 --tmux --session aegis-qwen
+```
+
+### OODA Steps To Complete GSL
+
+Use this flow when `python3 aegis_local_inference_server.py check-model gsl`
+reports that GSL is incomplete.
+
+1. **Observe**: confirm what is present now.
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py check-model gsl
+ls -lh /home/jsosa/workspace/BitNet/models/model-*-of-*.safetensors | wc -l
+ls -lh /home/jsosa/workspace/BitNet/models/config.json /home/jsosa/workspace/BitNet/models/model.safetensors.index.json 2>/dev/null
+ls -lh /home/jsosa/workspace/BitNet/models/tokenizer* 2>/dev/null
+```
+
+Expected complete state for the current GSL download shape:
+
+```text
+282 safetensors shard files
+model.safetensors.index.json
+config.json
+tokenizer files
+```
+
+2. **Orient**: identify what is missing from the local model directory.
+
+Current known incomplete state:
+
+```text
+Present: /home/jsosa/workspace/BitNet/models/model-00001-of-00282.safetensors
+Missing: shards 00002 through 00282, model.safetensors.index.json, config.json, tokenizer files
+Missing Python packages: torch, transformers, safetensors, accelerate
+```
+
+If the GSL download belongs in its own folder, move the completed files into a
+stable directory before registering it, for example:
+
+```bash
+mkdir -p /home/jsosa/workspace/BitNet/models/gsl
+mv /home/jsosa/workspace/BitNet/models/model-*-of-*.safetensors /home/jsosa/workspace/BitNet/models/gsl/
+mv /home/jsosa/workspace/BitNet/models/config.json /home/jsosa/workspace/BitNet/models/gsl/ 2>/dev/null || true
+mv /home/jsosa/workspace/BitNet/models/model.safetensors.index.json /home/jsosa/workspace/BitNet/models/gsl/ 2>/dev/null || true
+mv /home/jsosa/workspace/BitNet/models/tokenizer* /home/jsosa/workspace/BitNet/models/gsl/ 2>/dev/null || true
+```
+
+3. **Decide**: finish one clean model layout and register that path.
+
+For a completed GSL directory:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py add-model /home/jsosa/workspace/BitNet/models/gsl --alias gsl --backend transformers
+```
+
+For a single-file GGUF conversion of GSL, register the `.gguf` instead:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py add-model /home/jsosa/workspace/BitNet/models/gsl.gguf --alias gsl-gguf --backend llama.cpp
+```
+
+Prefer GGUF for this server today. The current serving path is production-ready
+for `llama.cpp`/GGUF models. Transformers/Safetensors validation exists, but
+serving Transformers models still requires adding the Transformers runtime path.
+
+4. **Act**: install dependencies only after the full checkpoint is present.
+
+Use the environment you intend to run the server with:
+
+```bash
+python3 -m pip install torch transformers safetensors accelerate
+```
+
+Then verify again:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py check-model gsl
+python3 aegis_local_inference_server.py list
+```
+
+5. **Act**: serve only after `Ready: yes`.
+
+For a GGUF GSL model:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model gsl-gguf --port 5510 --tmux --session aegis-gsl
+```
+
+For a Transformers GSL model, do not expect `serve --model gsl` to work until
+the server has a Transformers backend implementation. Keep using
+`check-model gsl` as the gate.
+
+6. **Act**: test the endpoint after startup.
+
+```bash
+curl -s -X POST http://127.0.0.1:5510/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"local","messages":[{"role":"user","content":"Reply with exactly: gsl-ok"}],"temperature":0,"max_tokens":16}'
+```
+
+### Current Known-Good tmux Setup
+
+As of the latest local smoke test, `qwen-coder-7b` is the known-good running
+model for this `llama-server` build.
+
+Start it:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py serve --model qwen-coder-7b --port 5510 --backend-port 5511 --tmux --session aegis-local
+```
+
+Health check:
+
+```bash
+curl -s http://127.0.0.1:5510/health
+```
+
+Chat smoke test:
+
+```bash
+curl -s -X POST http://127.0.0.1:5510/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"local","messages":[{"role":"user","content":"Reply with exactly: qwen-ok"}],"temperature":0,"max_tokens":16}'
+```
+
+Attach remotely:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py tmux-attach --session aegis-local
+```
+
+Stop it:
+
+```bash
+cd /home/jsosa/workspace/BitNet/src
+python3 aegis_local_inference_server.py tmux-stop --session aegis-local
+```
+
+Gemma note: `gemma-12b` validates as a file, but the current
+`/home/jsosa/workspace/BitNet/build/bin/llama-server` cannot load it because the
+GGUF declares architecture `gemma4`, which this llama-server build reports as
+unknown. Use `qwen-coder-7b` or a BitNet GGUF until llama.cpp/BitNet is rebuilt
+with Gemma 4 architecture support.

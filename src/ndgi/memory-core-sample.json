@@ -1,0 +1,8 @@
+[
+  {
+    "text": "Instruction: Query NDGi memory for graph topology.\nContext: [Insert TRIT_POS Node/Edge Data from NDGi Graph]\nResponse: Verified path continuity successfully."
+  },
+  {
+    "text": "Instruction: Analyze Aegis BET contract mapping.\nContext: Key fingerprint maps to 0x1 (TRIT_POS).\nResponse: System commits trusted state to non-volatile memory."
+  }
+]

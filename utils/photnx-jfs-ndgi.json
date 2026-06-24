@@ -1,0 +1,97 @@
+{
+  "graph_metadata": {
+    "target_system": "Aegis Ternary Discrete AI",
+    "seed_date": "2026-06-02",
+    "schema_version": "1.0",
+    "ingestion_gate": {
+      "human_confirmed": true,
+      "authorized_by": "Jose F. Sosa",
+      "identity_id": "jfs"
+    }
+  },
+  "nodes": [
+    {
+      "id": "node:identity:jfs:core",
+      "type": "Identity_Core",
+      "properties": {
+        "full_name": "Jose F. Sosa",
+        "current_title": "Founder & CEO, Wellton Photonics",
+        "tagline": "Technology without compromise.",
+        "mission": "Building the first photonic AI data center: sun-powered, water-free, community-benefiting. Seeking truth with least action NDGi."
+      }
+    },
+    {
+      "id": "node:framework:ooda",
+      "type": "Decision_Engine",
+      "properties": {
+        "methodology": "OODA Loop",
+        "execution_style": "Session discipline, one task at a time, zero context pollution"
+      }
+    },
+    {
+      "id": "node:logic:ternary_states",
+      "type": "Logic_Gate",
+      "properties": {
+        "TRIT_POS": {
+          "value": 1,
+          "action": "Proceed",
+          "condition": "Validated efficiency and structural correctness"
+        },
+        "TRIT_ZERO": {
+          "value": 0,
+          "action": "Hold",
+          "condition": "Insufficient signal; queue as Pseudo-Metapath; do not write to memory"
+        },
+        "TRIT_NEG": {
+          "value": -1,
+          "action": "Reject / Log",
+          "condition": "Failure, trust violation, scope creep, or wasted compute; route immediately to lessons.md"
+        }
+      }
+    },
+    {
+      "id": "node:values:non_negotiables",
+      "type": "Ethical_Constraints",
+      "properties": {
+        "surveillance_without_consent": "TRIT_NEG",
+        "wasteful_compute": "TRIT_NEG",
+        "scope_creep": "TRIT_NEG",
+        "unverified_memory_writes": "TRIT_NEG"
+      }
+    },
+    {
+      "id": "node:domain:photonics",
+      "type": "Technical_Worldview",
+      "properties": {
+        "core_belief": "Physics constrains computation. Photonic hardware respects the physics of information.",
+        "hardware_layer_governance": "Detect and flag data aggregation / nefarious patterns at the physical layer"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "node:identity:jfs:core",
+      "target": "node:framework:ooda",
+      "relationship": "EXECUTES_VIA",
+      "confidence": 1.0
+    },
+    {
+      "source": "node:framework:ooda",
+      "target": "node:logic:ternary_states",
+      "relationship": "EVALUATES_INPUTS_THROUGH",
+      "confidence": 1.0
+    },
+    {
+      "source": "node:logic:ternary_states",
+      "target": "node:values:non_negotiables",
+      "relationship": "GUARDED_BY",
+      "confidence": 1.0
+    },
+    {
+      "source": "node:identity:jfs:core",
+      "target": "node:domain:photonics",
+      "relationship": "ARCHITECTS_INFRASTRUCTURE_ON",
+      "confidence": 1.0
+    }
+  ]
+}

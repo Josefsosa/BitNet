@@ -1,0 +1,146 @@
+#!/bin/bash
+# ==============================================================================
+# Aegis Unified Automation Pipeline v1.0
+# Wellton Photonics | NDGi Core Engine Launcher
+# Principle: Seeking Truth with Least Action
+# ==============================================================================
+
+set -euo pipefail
+
+ROOT_DIR="/home/jsosa/workspace/BitNet"
+JSON_SEED="$ROOT_DIR/photonx-jfs-ndgi.json"
+LAUNCHER_SCRIPT="$ROOT_DIR/utils/aegis.sh"
+MODEL_PATH="$ROOT_DIR/models/bitnet_b1_58-3B/ggml-model-i2_s.gguf"
+
+echo -e "\033[0;34m[*] Phase 1: Configuring Runtime Environment Linkers...\033[0m"
+# Statically declare the verified library paths to avoid dynamic lookup failures
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROOT_DIR/build/3rdparty/llama.cpp/src:$ROOT_DIR/build/3rdparty/llama.cpp/ggml/src
+
+# Fast verification check
+if ! ldd "$ROOT_DIR/build/bin/llama-server" | grep -q "libllama.so"; then
+    echo -e "\033[0;31m[TRIT_NEG] Shared library verification broken. Check compilation space.\033[0m"
+    exit 1
+fi
+echo -e "\033[0;32m[TRIT_POS] Dynamic linkers confirmed and locked.\033[0m"
+
+echo -e "\033[0;34m[*] Phase 2: Verifying Weights and Models Matrix...\033[0m"
+if [ ! -f "$MODEL_PATH" ]; then
+    echo -e "\033[0;33m[TRIT_ZERO] Target weight binary missing at: $MODEL_PATH\033[0m"
+    echo "Searching root directory for your GGUF model file..."
+    FOUND_MODEL=$(find "$ROOT_DIR" -name "ggml-model-i2_s.gguf" -print -quit)
+    
+    if [ -n "$FOUND_MODEL" ]; then
+        echo -e "\033[0;32m[*] Found weights at $FOUND_MODEL. Relocating to expected pathing structure...\033[0m"
+        mkdir -p "$(dirname "$MODEL_PATH")"
+        cp "$FOUND_MODEL" "$MODEL_PATH"
+    else
+        echo -e "\033[0;31m[TRIT_NEG] Aborting: 'ggml-model-i2_s.gguf' not found in workspace tree.\033[0m"
+        exit 1
+    fi
+fi
+echo -e "\033[0;32m[TRIT_POS] Ternary model binary verified at destination path.\033[0m"
+
+echo -e "\033[0;34m[*] Phase 3: Launching 1.58-Bit Ternary Inference Server (Background Process)...\033[0m"
+# Activate your python virtual environment securely
+source "$ROOT_DIR/venv/bin/activate"
+
+# Start the python engine execution loop as a decoupled background service
+python3 "$ROOT_DIR/run_inference_server.py" --port 8080 > "$ROOT_DIR/logs/server_output.log" 2>&1 &
+SERVER_PID=$!
+
+# Trap sequence ensures the background server terminates if this script breaks early
+trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+
+echo -e "\033[0;34m[*] Waiting for port 8080 to stabilize and accept handshakes...\033[0m"
+for i in {1..15}; do
+    if curl -s http://127.0.0.1:8080/v1/models &>/dev/null || grep -q "HTTP server is listening" "$ROOT_DIR/logs/server_output.log" 2>/dev/null; then
+        echo -e "\033[0;32m[TRIT_POS] Local Inference Server is alive and listening.\033[0m"
+        break
+    fi
+    if [ $i -eq 15 ]; then
+        echo -e "\033[0;31m[TRIT_NEG] Server initialization timed out. Inspection log tail:\033[0m"
+        tail -n 10 "$ROOT_DIR/logs/server_output.log"
+        exit 1
+    fi
+    sleep 1
+done
+
+echo -e "\033[0;34m[*] Phase 4: Setting Permissions and Initializing Identity Graph Ingestion...\033[0m"
+chmod +x "$LAUNCHER_SCRIPT"
+
+if [ -f "$JSON_SEED" ]; then
+    # Ingest the personality profile directly into the freshly spawned discrete logic loop
+    "$LAUNCHER_SCRIPT" "$JSON_SEED"
+else
+    echo -e "\033[0;33m[TRIT_ZERO] No seed graph found at $JSON_SEED. Server left active on port 8080.\033[0m"
+fi
+
+# Disown background process so the port stays up and active for subsequent CLI prompts
+echo -e "\033[0;32m[TRIT_POS] Aegis Core initialized. System running on PID $SERVER_PID. Ready for commands.\033[0m"
+# ------------------------------------------------------------------------------
+# Phase 5: Spawning Isolated Tmux Workspace Matrix
+# ------------------------------------------------------------------------------
+echo -e "\033[0;34m[*] Phase 5: Spawning Isolated Tmux Workspace Matrix...\033[0m"
+SESSION_NAME="aegis-core"
+AEGIS_WORKSPACE="/home/jsosa/workspace/aegis-ternary"
+API_URL="http://127.0.0.1:8080/v1/chat/completions"
+MODEL_NAME="aegis-coder"
+
+# Clear out any stale dead sessions with the same name safely
+tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
+
+# 1. Create session, name primary pane "Console"
+tmux new-session -d -s "$SESSION_NAME" -c "$AEGIS_WORKSPACE" -n "Aegis-Ternary-Core"
+
+# 2. Split Pane 0 horizontally to create an automated prompt loop tool
+tmux split-window -h -c "$AEGIS_WORKSPACE"
+
+# 3. Split Pane 1 vertically to track real-time server logging pipelines
+tmux split-window -v -c "$ROOT_DIR"
+
+# 4. Configure Pane 2 to continually tail output logs from BitNet server
+tmux send-keys -t "$SESSION_NAME:0.2" "tail -f $ROOT_DIR/logs/server_output.log" C-m
+
+# 5. Inject the inline prompt interface directly inside Pane 0.0
+PROMPT_CMD="
+clear;
+echo -e '\033[0;32m====================================================\033[0m';
+echo -e '\033[0;32m   AEGIS TERNARY INTERACTIVE LOCAL CLI MATRIX       \033[0m';
+echo -e '\033[0;32m====================================================\033[0m';
+while true; do
+    echo -e '\n\033[1;36mAegis Prompt ❯\033[0m ';
+    read -r USER_PROMPT;
+    if [ '\$USER_PROMPT' = 'exit' ]; then break; fi;
+    if [ -z '\$USER_PROMPT' ]; then continue; fi;
+    
+    echo -e '\n\033[0;34m[*] Dispatching local inference query...\033[0m';
+    
+    RESPONSE=\$(curl -s '$API_URL' \
+      -H 'Content-Type: application/json' \
+      -d \$(jq -n --arg sys \"\$SYSTEM_PROMPT\" --arg usr \"\$USER_PROMPT\" --arg model '$MODEL_NAME' \
+        '{model: \$model, messages: [{role: \"system\", content: \$sys}, {role: \"user\", content: \$usr}], max_tokens: 2048, temperature: 0.2}'));
+    
+    OUTPUT=\$(echo '\$RESPONSE' | jq -r '.choices[0].message.content // empty');
+    if [ -z '\$OUTPUT' ]; then
+        echo -e '\033[0;31m[TRIT_NEG] Inference failed or broke JSON formatting schemas.\033[0m';
+        echo '\$RESPONSE' | jq '.';
+    else
+        echo -e '\033[0;32m--------------------------------------------------------------------------------\033[0m';
+        echo -e \"\$OUTPUT\";
+        echo -e '\033[0;32m--------------------------------------------------------------------------------\033[0m';
+    fi
+done"
+
+tmux send-keys -t "$SESSION_NAME:0.0" "$PROMPT_CMD" C-m
+
+# 6. Prepare Pane 0.1 as your open development bash shell
+tmux send-keys -t "$SESSION_NAME:0.1" "cd $AEGIS_WORKSPACE" C-m
+
+# Cleanly disown the background process loop
+disown $SERVER_PID
+trap - EXIT
+
+# Attach directly to the workspace interface
+echo -e "\033[0;32m[TRIT_POS] Environment initialization stable. Handing off to visual matrix...\033[0m"
+sleep 1
+tmux attach-session -t "$SESSION_NAME"
